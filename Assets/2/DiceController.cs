@@ -13,10 +13,18 @@ public class DiceController : MonoBehaviour
     private bool isSelected = false;
     private Vector3Int lastPrintedCell;
 
+    private SpriteRenderer spriteRenderer;
+    private Color defaultColor;
+    public Color selectedColor = Color.yellow; // color when selected
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
+
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+            defaultColor = spriteRenderer.color;
     }
 
     void Update()
@@ -59,7 +67,9 @@ public class DiceController : MonoBehaviour
 
             if (clicked == GetComponent<Collider2D>())
             {
+                // Select this dice
                 isSelected = true;
+                UpdateColor();
             }
             else if (isSelected)
             {
@@ -76,12 +86,15 @@ public class DiceController : MonoBehaviour
                 if (Mathf.Abs(dx) == Mathf.Abs(dy) && dx != 0)
                 {
                     MoveToCell(targetCell);
-                    isSelected = false;
                 }
                 else
                 {
                     Debug.Log("Invalid move: only diagonal allowed!");
                 }
+
+                // Deselect after move attempt
+                isSelected = false;
+                UpdateColor();
             }
         }
     }
@@ -98,5 +111,11 @@ public class DiceController : MonoBehaviour
         Vector3 direction = (target - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         rb.rotation = angle;
+    }
+
+    void UpdateColor()
+    {
+        if (spriteRenderer != null)
+            spriteRenderer.color = isSelected ? selectedColor : defaultColor;
     }
 }
