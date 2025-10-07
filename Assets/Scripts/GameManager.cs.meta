@@ -3,7 +3,10 @@ guid: 4e5977116e2d5924b9edee71aefcb5be
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - LogicTilemap: {instanceID: 0}
+  - redPiecePrefab: {fileID: 2143331248095616130, guid: 410747b3797a71a4fb835f9a274de8e5, type: 3}
+  - blackPiecePrefab: {fileID: 6827207837443577119, guid: 0ff45e01c2e606f459e2194ef2806063, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
