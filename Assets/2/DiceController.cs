@@ -3,47 +3,66 @@ using UnityEngine.Tilemaps;
 
 public class DiceController : MonoBehaviour
 {
-    public Tilemap tilemap; // Assign your Tilemap in the inspector
-    public float moveSpeed = 5f; // Speed of movement
+    public Tilemap tilemap;         // assign your tilemap
+    public float moveSpeed = 5f;    // tiles per second
+
     private bool isMoving = false;
     private Vector3 targetPosition;
+    private Rigidbody2D rb;
+    private bool isSelected = false;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Kinematic; // ensure it doesn't fall
+    }
 
     void Update()
     {
+        // Handle movement
         if (isMoving)
         {
-            // Move towards target
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-            if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
+            Vector3 newPos = Vector3.MoveTowards(rb.position, targetPosition, moveSpeed * Time.deltaTime);
+            rb.MovePosition(newPos);
+
+            if (Vector3.Distance(rb.position, targetPosition) < 0.01f)
             {
-                transform.position = targetPosition;
+                rb.position = targetPosition;
                 isMoving = false;
             }
         }
-    }
 
-    void OnMouseDown()
-    {
-        // Detect click and show options (diagonals)
-        // For simplicity, we'll use arrow keys for now, can replace with UI buttons
-        Debug.Log("Dice clicked! Press arrow keys to move diagonally.");
-    }
-
-    void FixedUpdate()
-    {
-        if (!isMoving)
+        // Deselect if clicked elsewhere
+        if (Input.GetMouseButtonDown(0))
         {
-            Vector3Int currentCell = tilemap.WorldToCell(transform.position);
+            Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mouseWorld.z = 0;
 
-            // Diagonal movement via arrow keys (for testing)
-            if (Input.GetKeyDown(KeyCode.W) && Input.GetKeyDown(KeyCode.D))
-                MoveToCell(currentCell + new Vector3Int(1, 1, 0));
-            else if (Input.GetKeyDown(KeyCode.W) && Input.GetKeyDown(KeyCode.A))
-                MoveToCell(currentCell + new Vector3Int(-1, 1, 0));
-            else if (Input.GetKeyDown(KeyCode.S) && Input.GetKeyDown(KeyCode.D))
-                MoveToCell(currentCell + new Vector3Int(1, -1, 0));
-            else if (Input.GetKeyDown(KeyCode.S) && Input.GetKeyDown(KeyCode.A))
-                MoveToCell(currentCell + new Vector3Int(-1, -1, 0));
+            // If clicking on the dice
+            if (GetComponent<Collider2D>() == Physics2D.OverlapPoint(mouseWorld))
+            {
+                isSelected = true;
+            }
+            else if (isSelected)
+            {
+                // Move to clicked tile
+                Vector3Int targetCell = tilemap.WorldToCell(mouseWorld);
+
+                // Ensure diagonal movement (x and y both change)
+                Vector3Int currentCell = tilemap.WorldToCell(transform.position);
+                int dx = targetCell.x - currentCell.x;
+                int dy = targetCell.y - currentCell.y;
+
+                if (Mathf.Abs(dx) == Mathf.Abs(dy) && dx != 0) // must be diagonal
+                {
+                    MoveToCell(targetCell);
+                    isSelected = false; // optional: deselect after move
+                }
+                else
+                {
+                    Debug.Log("You can only move diagonally!");
+                }
+            }
         }
     }
 
@@ -58,6 +77,6 @@ public class DiceController : MonoBehaviour
     {
         Vector3 direction = (target - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        rb.rotation = angle;
     }
 }
