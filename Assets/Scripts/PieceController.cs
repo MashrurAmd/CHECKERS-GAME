@@ -37,6 +37,7 @@ public class PieceController : MonoBehaviour
             }
         }
 
+
         // Move piece
         gameManager.board[targetCell.x, targetCell.y] = pieceId;
         Vector3 worldPos = gameManager.LogicTilemap.GetCellCenterWorld(new Vector3Int(targetCell.x, targetCell.y, 0));
@@ -48,6 +49,9 @@ public class PieceController : MonoBehaviour
         // King promotion
         if (pieceId == 1 && targetCell.y == 7) PromoteToKing();
         if (pieceId == -1 && targetCell.y == 0) PromoteToKing();
+
+
+        
     }
 
     bool IsValidMove(Vector2Int target, out Vector2Int? capturedCell)
