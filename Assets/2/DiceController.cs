@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class DiceController : MonoBehaviour
 {
-    public Tilemap tilemap;         // assign your tilemap
-    public float moveSpeed = 5f;    // tiles per second
+    public Tilemap tilemap;          // Assign Tilemap component here
+    public float moveSpeed = 5f;     // Tiles per second
 
     private bool isMoving = false;
     private Vector3 targetPosition;
@@ -14,12 +14,18 @@ public class DiceController : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.bodyType = RigidbodyType2D.Kinematic; // ensure it doesn't fall
+        rb.bodyType = RigidbodyType2D.Kinematic; // Prevent falling
     }
 
     void Update()
     {
-        // Handle movement
+        HandleMovement();
+
+        HandleMouseInput();
+    }
+
+    void HandleMovement()
+    {
         if (isMoving)
         {
             Vector3 newPos = Vector3.MoveTowards(rb.position, targetPosition, moveSpeed * Time.deltaTime);
@@ -31,25 +37,28 @@ public class DiceController : MonoBehaviour
                 isMoving = false;
             }
         }
+    }
 
-        // Deselect if clicked elsewhere
+    void HandleMouseInput()
+    {
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mouseWorld.z = 0;
 
-            // If clicking on the dice
-            if (GetComponent<Collider2D>() == Physics2D.OverlapPoint(mouseWorld))
+            Collider2D clicked = Physics2D.OverlapPoint(mouseWorld);
+
+            if (clicked == GetComponent<Collider2D>())
             {
+                // Dice clicked → select it
                 isSelected = true;
             }
             else if (isSelected)
             {
-                // Move to clicked tile
+                // Mouse clicked somewhere else → attempt to move
                 Vector3Int targetCell = tilemap.WorldToCell(mouseWorld);
-
-                // Ensure diagonal movement (x and y both change)
                 Vector3Int currentCell = tilemap.WorldToCell(transform.position);
+
                 int dx = targetCell.x - currentCell.x;
                 int dy = targetCell.y - currentCell.y;
 
@@ -60,7 +69,7 @@ public class DiceController : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("You can only move diagonally!");
+                    Debug.Log("Invalid move: only diagonal allowed!");
                 }
             }
         }
