@@ -410,7 +410,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dicePrefab: {fileID: 8185365739424795780, guid: 56acc9e1f908c8a42b14b1daf5ac3ebc, type: 3}
   tilemap: {fileID: 52321185}
-  spawnCell: {x: 0, y: 0, z: 0}
 --- !u!4 &969242890
 Transform:
   m_ObjectHideFlags: 0
@@ -420,7 +419,7 @@ Transform:
   m_GameObject: {fileID: 969242888}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.4, y: 0.39, z: -0.06404221}
+  m_LocalPosition: {x: -3.37, y: -3.45, z: -0.06404221}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
