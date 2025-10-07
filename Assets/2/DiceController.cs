@@ -20,8 +20,11 @@ public class DiceController : MonoBehaviour
     void Update()
     {
         HandleMovement();
-
         HandleMouseInput();
+
+        // Print dice's current tile position without z
+        Vector3Int currentCell = tilemap.WorldToCell(transform.position);
+        Debug.Log("Dice is at tile: (" + currentCell.x + ", " + currentCell.y + ")");
     }
 
     void HandleMovement()
