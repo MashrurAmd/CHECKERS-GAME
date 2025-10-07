@@ -12,7 +12,16 @@ public class DiceSpawner : MonoBehaviour
         new Vector3Int(-4, -4, 0),
         new Vector3Int(-2, -4, 0),
         new Vector3Int(0, -4, 0),
-        new Vector3Int(2, -4, 0)
+        new Vector3Int(2, -4, 0),
+        new Vector3Int(-3, -3, 0),
+        new Vector3Int(-1, -3, 0),
+        new Vector3Int(1, -3, 0),
+        new Vector3Int(3, -3, 0),
+        new Vector3Int(-4, -2, 0),
+        new Vector3Int(-2, -2, 0),
+        new Vector3Int(0, -2, 0),
+        new Vector3Int(2, -2, 0)
+
     };
 
     void Start()
