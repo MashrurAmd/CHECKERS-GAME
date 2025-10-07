@@ -3,28 +3,26 @@ using UnityEngine.Tilemaps;
 
 public class DiceController : MonoBehaviour
 {
-    public Tilemap tilemap;          // Assign Tilemap component here
-    public float moveSpeed = 5f;     // Tiles per second
+    public Tilemap tilemap;
+    public float moveSpeed = 5f; // Tiles per second
+    public int boardSize = 8;    // Board is 8x8
 
     private bool isMoving = false;
     private Vector3 targetPosition;
     private Rigidbody2D rb;
     private bool isSelected = false;
+    private Vector3Int lastPrintedCell;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.bodyType = RigidbodyType2D.Kinematic; // Prevent falling
+        rb.bodyType = RigidbodyType2D.Kinematic;
     }
 
     void Update()
     {
         HandleMovement();
         HandleMouseInput();
-
-        // Print dice's current tile position without z
-        Vector3Int currentCell = tilemap.WorldToCell(transform.position);
-        Debug.Log("Dice is at tile: (" + currentCell.x + ", " + currentCell.y + ")");
     }
 
     void HandleMovement()
@@ -33,6 +31,14 @@ public class DiceController : MonoBehaviour
         {
             Vector3 newPos = Vector3.MoveTowards(rb.position, targetPosition, moveSpeed * Time.deltaTime);
             rb.MovePosition(newPos);
+
+            // Print tile only when moving and tile changes
+            Vector3Int currentCell = tilemap.WorldToCell(rb.position);
+            if (currentCell != lastPrintedCell)
+            {
+                Debug.Log("Dice is at tile: (" + currentCell.x + ", " + currentCell.y + ")");
+                lastPrintedCell = currentCell;
+            }
 
             if (Vector3.Distance(rb.position, targetPosition) < 0.01f)
             {
@@ -53,22 +59,24 @@ public class DiceController : MonoBehaviour
 
             if (clicked == GetComponent<Collider2D>())
             {
-                // Dice clicked → select it
                 isSelected = true;
             }
             else if (isSelected)
             {
-                // Mouse clicked somewhere else → attempt to move
                 Vector3Int targetCell = tilemap.WorldToCell(mouseWorld);
-                Vector3Int currentCell = tilemap.WorldToCell(transform.position);
 
+                // Clamp target to 8x8 board
+                targetCell.x = Mathf.Clamp(targetCell.x, -boardSize / 2, boardSize / 2 - 1);
+                targetCell.y = Mathf.Clamp(targetCell.y, -boardSize / 2, boardSize / 2 - 1);
+
+                Vector3Int currentCell = tilemap.WorldToCell(transform.position);
                 int dx = targetCell.x - currentCell.x;
                 int dy = targetCell.y - currentCell.y;
 
-                if (Mathf.Abs(dx) == Mathf.Abs(dy) && dx != 0) // must be diagonal
+                if (Mathf.Abs(dx) == Mathf.Abs(dy) && dx != 0)
                 {
                     MoveToCell(targetCell);
-                    isSelected = false; // optional: deselect after move
+                    isSelected = false;
                 }
                 else
                 {
